@@ -124,11 +124,11 @@ var pool = function(opts) {
     })
 
     if (worker.process) return worker
-
     var child = worker.process = proc.spawn(path.join(__dirname, 'bin/convert'))
-
     var onerror = once(function(err) {
+      console.log(err)
       child.kill()
+
     })
 
     child.on('exit', function(code) {

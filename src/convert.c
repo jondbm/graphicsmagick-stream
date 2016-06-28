@@ -266,7 +266,7 @@ int parse (size_t size, unsigned char *data) {
     if (opts->split) {
       // If we split the file then we will make a tarball containing all the pages
       char* filename;
-      filename = tmpnam (NULL);
+      filename = "/tmp/cmguiXXXXXX";
       size = write_archive_from_mem(filename, output);
       writtendata = io_write_file_to_stdout(filename);
       unlink(filename);
