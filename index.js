@@ -124,6 +124,8 @@ var pool = function(opts) {
     })
 
     if (worker.process) return worker
+      console.log('SPAWNING:')
+    console.log(path.join(__dirname, 'bin/convert'))
     var child = worker.process = proc.spawn(path.join(__dirname, 'bin/convert'))
     var onerror = once(function(err) {
       console.log(err)
