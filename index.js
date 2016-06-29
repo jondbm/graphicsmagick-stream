@@ -127,8 +127,7 @@ var pool = function(opts) {
       console.log('SPAWNING:')
     console.log(path.join(__dirname, 'bin/convert'))
     var child = worker.process = proc.spawn(path.join(__dirname, 'bin/convert'))
-    console.log('childproc==')
-    console.log(child)
+console.log('thisfar')
     var onerror = once(function(err) {
       console.log('child process ERRORS!')
       console.log(err)
