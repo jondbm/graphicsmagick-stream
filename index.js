@@ -96,6 +96,8 @@ var destroyer = function(stream) {
 }
 
 var pool = function(opts) {
+  console.log('POLOPTS=')
+  console.log(opts)
   if (!opts) opts = {}
 
   var size = opts.size || 1
@@ -239,9 +241,9 @@ module.exports = function(defaults) {
 
   var convert = function(opts) {
     console.log('trying to convert')
-    console.log('opts:')
+    console.log('optsx:')
     console.log(opts)
-    return exec(xtend(defaults, opts))
+    return exec(xtend(defaults))
   }
 
   convert.info = function(opts, cb) {
