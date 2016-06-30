@@ -126,8 +126,7 @@ var pool = function(opts) {
     })
 
     if (worker.process) return worker
-      console.log('SPAWNING:')
-    console.log(path.join(__dirname, 'bin/convert'))
+      console.log('SPAWNING:'+ path.join(__dirname, 'bin/convert'))
     var child = worker.process = proc.spawn(path.join(__dirname, 'bin/convert'))
 console.log('thisfar')
     var onerror = once(function(err) {
@@ -241,7 +240,7 @@ module.exports = function(defaults) {
 
   var convert = function(opts) {
     console.log('trying to convert')
-    console.log('opts:')
+    console.log('opt gs:')
     console.log(opts)
     return exec(xtend(defaults, opts))
   }
