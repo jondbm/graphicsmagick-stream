@@ -86,6 +86,7 @@ var toStruct = function(opts) {
 }
 
 var destroyer = function(stream) {
+  console.log('destroyer')
   var destroyed = false
   return function(err) {
     if (destroyed) return
@@ -96,7 +97,7 @@ var destroyer = function(stream) {
 }
 
 var pool = function(opts) {
-  console.log('POLOPTS=')
+  console.log('pool:')
   console.log(opts)
   if (!opts) opts = {}
 
@@ -105,6 +106,7 @@ var pool = function(opts) {
   for (var i = 0; i < size; i++) workers[i] = {queue:[], process:null}
 
   var update = function(worker) {
+    console.log('UPDATE...')
     if (!worker.process) return
 
     if (worker.queue.length) {
@@ -121,32 +123,31 @@ var pool = function(opts) {
   }
 
   var select = function() {
+    console.log('SELECT')
     var worker = workers.reduce(function(a, b) {
       return a.queue.length <= b.queue.length ? a : b
     })
 
     if (worker.process) return worker
-      console.log('SPAWNING:'+ path.join(__dirname, 'bin/convert'))
     var child = worker.process = proc.spawn(path.join(__dirname, 'bin/convert'))
-console.log('thisfar')
     var onerror = once(function(err) {
-      console.log('child process ERRORS!')
-       console.log(err)
-      // child.kill()
+      console.log('CHILD KILL')
+      console.log(err)
+      child.kill()
 
     })
 
     child.on('exit', function(code) {
-      console.log('exiteer')
-     /* var err = new Error('graphicsmagick crashed with code: '+code)
+      console.log('CHILD EXIT')
+      var err = new Error('graphicsmagick crashed with code: '+code)
       if (stream) stream.destroy(err)
       while (worker.queue.length) worker.queue.shift().destroy(err)
-      worker.process = null*/
+      worker.process = null
     })
 
-    //child.stdout.on('error', onerror)
-    //child.stderr.on('error', onerror)
-    //child.stdin.on('error', onerror)
+    child.stdout.on('error', onerror)
+    child.stderr.on('error', onerror)
+    child.stdin.on('error', onerror)
     if (DEBUGGING) child.stderr.pipe(process.stderr)
 
     var missing = 0
@@ -154,6 +155,7 @@ console.log('thisfar')
 
     var draining = false
     var drain = function() {
+      console.log('drainging')
       if (draining) return
       draining = true
 
@@ -189,6 +191,7 @@ console.log('thisfar')
   }
 
   return function(opts) {
+    console.log('worksel')
     var worker = select()
     var dup = new Duplex()
     var buffer = [toStruct(opts)]
@@ -196,6 +199,7 @@ console.log('thisfar')
     var wait
 
     dup.on('finish', function() {
+      console.log('finisti')
       buffer = Buffer.concat(buffer)
       worker.process.stdin.write(toUInt32LE(buffer.length))
       worker.process.stdin.write(buffer)
@@ -203,6 +207,7 @@ console.log('thisfar')
 
     dup._read = noop
     dup._write = function(data, enc, cb) {
+      console.log('writer...')
       if (worker.queue[0] !== dup) {
         wait = [data, cb]
         return
@@ -213,12 +218,14 @@ console.log('thisfar')
     }
 
     dup.kick = function() {
+      console.log('kick')
       var w = wait
       wait = null
       if (w) dup._write(w[0], null, w[1])
     }
 
     dup.destroy = function(err) {
+      console.log('destroy')
       if (destroyed) return
       destroyed = true
       if (err) dup.emit('error', err)
@@ -240,16 +247,17 @@ module.exports = function(defaults) {
   var exec = pool({size:size})
 
   var convert = function(opts) {
-    console.log('trying to convert')
-    console.log('opt gs:')
+    console.log('DEFS=')
+    console.log(defaults)
+    console.log('OPTS==')
     console.log(opts)
-    // return exec(xtend(defaults, opts))
+    return exec(xtend(defaults, opts))
   }
 
   convert.info = function(opts, cb) {
     if (typeof opts === 'function') return convert.info(null, opts)
     if (!opts) opts = {}
-
+      console.log('infogo')
     opts.format = 'info'
     cb = once(cb)
     var buf = []
@@ -257,9 +265,12 @@ module.exports = function(defaults) {
     return convert(opts)
       .on('error', cb)
       .on('data', function(data) {
+        console.log('PUSH DATA')
         buf.push(data)
       })
       .on('end', function() {
+
+        console.log('PUSH END')
         cb(null, fromInfoStruct(Buffer.concat(buf)))
       })
   }
