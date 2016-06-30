@@ -243,7 +243,7 @@ module.exports = function(defaults) {
     console.log('trying to convert')
     console.log('opt gs:')
     console.log(opts)
-    return exec(xtend(defaults, opts))
+    // return exec(xtend(defaults, opts))
   }
 
   convert.info = function(opts, cb) {
