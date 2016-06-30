@@ -131,21 +131,22 @@ var pool = function(opts) {
 console.log('thisfar')
     var onerror = once(function(err) {
       console.log('child process ERRORS!')
-      console.log(err)
-      child.kill()
+       console.log(err)
+      // child.kill()
 
     })
 
     child.on('exit', function(code) {
-      var err = new Error('graphicsmagick crashed with code: '+code)
+      console.log('exiteer')
+     /* var err = new Error('graphicsmagick crashed with code: '+code)
       if (stream) stream.destroy(err)
       while (worker.queue.length) worker.queue.shift().destroy(err)
-      worker.process = null
+      worker.process = null*/
     })
 
-    child.stdout.on('error', onerror)
-    child.stderr.on('error', onerror)
-    child.stdin.on('error', onerror)
+    //child.stdout.on('error', onerror)
+    //child.stderr.on('error', onerror)
+    //child.stdin.on('error', onerror)
     if (DEBUGGING) child.stderr.pipe(process.stderr)
 
     var missing = 0
